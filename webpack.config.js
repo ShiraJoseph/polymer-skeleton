@@ -66,6 +66,15 @@ const copyStatics = {
  */
 const plugins = IS_DEV ? [
   new CopyWebpackPlugin(copyStatics.copyWebcomponents),
+  new webpack.optimize.CommonsChunkPlugin({
+    name: 'vendor',
+    filename: 'vendor.js',
+    minChunks: Infinity
+  }),
+  new webpack.optimize.CommonsChunkPlugin({
+    name: 'commons',
+    filename: 'commons.js'
+  }),
   new webpack.DefinePlugin({'process.env': processEnv})
 ] : [
   new WorkboxPlugin({
@@ -80,11 +89,17 @@ const plugins = IS_DEV ? [
 ];
 
 const SHARED = {
-  entry: './src/index.js',
+  entry: {
+    vendor: [
+      '@polymer/polymer/polymer-element',
+      '@polymer/polymer/lib/elements/dom-if'
+    ],
+    app: './src/index.js'
+  },
   devtool: 'cheap-module-source-map',
   output: {
     path: OUTPUT_PATH,
-    filename: IS_MODULE_BUILD ? 'module.bundle.js' : 'bundle.js'
+    filename: IS_MODULE_BUILD ? '[name].module.bundle.js' : '[name].bundle.js'
   },
   module: {
     rules: [
