@@ -5,13 +5,17 @@
   <meta charset="UTF-8">
 
   <!-- MAIN IMPORTS -->
-  <script src="/node_modules/@webcomponents/webcomponentsjs/custom-elements-es5-adapter.js"></script>
-  <script src="/node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
+  <script src="/node_modules/@webcomponents/webcomponentsjs/custom-elements-es5-adapter.js" async nomodule></script>
+  <script src="/node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js" async></script>
   <script src="/node_modules/web-component-tester/browser.js"></script>
 
   <script src="/node_modules/@polymer/test-fixture/test-fixture.js"></script>
   <!-- All bundle -->
-  <script src="/dist/bundle.js"></script>
+  <script src="/dist/common.js"></script>
+  <script src="/dist/vendor.bundle.js" nomodule></script>
+  <script src="/dist/vendor.module.bundle.js" type="module"></script>
+  <script src="/dist/app.bundle.js" nomodule></script>
+  <script src="/dist/app.module.bundle.js" type="module"></script>
 </head>
 
 <body>

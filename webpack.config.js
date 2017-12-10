@@ -66,13 +66,9 @@ const copyStatics = {
 const plugins = IS_DEV_SERVER ? [
   new CopyWebpackPlugin(copyStatics.copyWebcomponents),
   new webpack.optimize.CommonsChunkPlugin({
-    name: 'vendor',
-    filename: 'vendor.js',
+    name: 'common',
+    filename: 'common.js',
     minChunks: Infinity
-  }),
-  new webpack.optimize.CommonsChunkPlugin({
-    name: 'commons',
-    filename: 'commons.js'
   }),
   new webpack.DefinePlugin({'process.env': processEnv})
 ] : [
@@ -84,9 +80,13 @@ const plugins = IS_DEV_SERVER ? [
   new CopyWebpackPlugin(
     [].concat(copyStatics.copyWebcomponents, copyStatics.copyOthers)
   ),
+  new webpack.optimize.CommonsChunkPlugin({
+    name: 'common',
+    filename: 'common.js',
+    minChunks: Infinity
+  }),
   new webpack.DefinePlugin({'process.env': processEnv})
 ];
-
 
 const shared = env => {
   const IS_MODULE_BUILD = env.BROWSERS === 'module';

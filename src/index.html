@@ -89,14 +89,21 @@
 
       var scriptVendor = document.createElement('script');
       scriptVendor.async = true
-      scriptVendor.src = './vendor.js';
+      scriptVendor.src = './vendor.bundle.js';
+      scriptVendor.setAttribute('nomodule', true);
+
+      var scriptVendorModule = document.createElement('script');
+      scriptVendorModule.async = true
+      scriptVendorModule.src = './vendor.module.bundle.js';
+      scriptVendorModule.setAttribute('type', 'module');
 
       var scriptCommons = document.createElement('script');
       scriptCommons.async = true
-      scriptCommons.src = './commons.js';
+      scriptCommons.src = './common.js';
 
       var refScript = document.body.getElementsByTagName('script')[0];
       refScript.parentNode.insertBefore(scriptCommons, refScript);
+      refScript.parentNode.insertBefore(scriptVendorModule, refScript);
       refScript.parentNode.insertBefore(scriptVendor, refScript);
       refScript.parentNode.insertBefore(script, refScript);
       refScript.parentNode.insertBefore(scriptModule, refScript);
