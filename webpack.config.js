@@ -11,10 +11,9 @@ const pkg = require('./package.json');
 const moduleConf = require('./webpack-module.config');
 const nomoduleConf = require('./webpack-nomodule.config');
 
-const ENV = process.env.NODE_ENV;
-const IS_DEV = process.argv.find(arg => arg.includes('webpack-dev-server'));
-const IS_MODULE_BUILD = process.env.BROWSERS === 'module';
-const OUTPUT_PATH = IS_DEV ? resolve('src') : resolve('dist');
+const ENV = process.argv.find(arg => arg.includes('NODE_ENV=production')) ? 'production' : 'development';
+const IS_DEV_SERVER = process.argv.find(arg => arg.includes('webpack-dev-server'));
+const OUTPUT_PATH = IS_DEV_SERVER ? resolve('src') : resolve('dist');
 
 const processEnv = {
   NODE_ENV: JSON.stringify(ENV),
@@ -64,7 +63,7 @@ const copyStatics = {
 /**
  * Plugin configuration
  */
-const plugins = IS_DEV ? [
+const plugins = IS_DEV_SERVER ? [
   new CopyWebpackPlugin(copyStatics.copyWebcomponents),
   new webpack.optimize.CommonsChunkPlugin({
     name: 'vendor',
@@ -88,42 +87,47 @@ const plugins = IS_DEV ? [
   new webpack.DefinePlugin({'process.env': processEnv})
 ];
 
-const SHARED = {
-  entry: {
-    vendor: [
-      '@polymer/polymer/polymer-element',
-      '@polymer/polymer/lib/elements/dom-if'
-    ],
-    app: './src/index.js'
-  },
-  devtool: 'cheap-module-source-map',
-  output: {
-    path: OUTPUT_PATH,
-    filename: IS_MODULE_BUILD ? '[name].module.bundle.js' : '[name].bundle.js'
-  },
-  module: {
-    rules: [
-      {
-        test: /\.html$/,
-        use: ['text-loader']
-      },
-      {
-        test: /\.postcss$/,
-        use: ['text-loader', 'postcss-loader']
-      }
-    ]
-  },
-  plugins,
-  devServer: {
-    contentBase: OUTPUT_PATH,
-    compress: true,
-    overlay: {
-      errors: true
+
+const shared = env => {
+  const IS_MODULE_BUILD = env.BROWSERS === 'module';
+
+  return {
+    entry: {
+      vendor: [
+        '@polymer/polymer/polymer-element',
+        '@polymer/polymer/lib/elements/dom-if'
+      ],
+      app: './src/index.js'
     },
-    port: 3000,
-    host: '0.0.0.0',
-    disableHostCheck: true
-  }
+    devtool: 'cheap-module-source-map',
+    output: {
+      path: OUTPUT_PATH,
+      filename: IS_MODULE_BUILD ? '[name].module.bundle.js' : '[name].bundle.js'
+    },
+    module: {
+      rules: [
+        {
+          test: /\.html$/,
+          use: ['text-loader']
+        },
+        {
+          test: /\.postcss$/,
+          use: ['text-loader', 'postcss-loader']
+        }
+      ]
+    },
+    plugins,
+    devServer: {
+      contentBase: OUTPUT_PATH,
+      compress: true,
+      overlay: {
+        errors: true
+      },
+      port: 3000,
+      host: '0.0.0.0',
+      disableHostCheck: true
+    }
+  };
 };
 
-module.exports = merge(IS_MODULE_BUILD ? moduleConf : nomoduleConf, SHARED);
+module.exports = (env = {}) => merge(env.BROWSERS === 'module' ? moduleConf() : nomoduleConf(), shared(env));
